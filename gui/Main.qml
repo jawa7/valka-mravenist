@@ -17,20 +17,26 @@ ApplicationWindow {
         onClicked: window.inGame = true
     }
 
-    Grid {
+    GridView {
         anchors.centerIn: parent
         visible: window.inGame
-        columns: 2
-        spacing: 4
+        width: 2 * 84
+        height: 2 * 84
+        cellWidth: 84
+        cellHeight: 84
+        interactive: false
 
-        Repeater {
-            model: 4
+        model: ListModel {
+            ListElement { col: 0; row: 0; terrainType: "grass" }
+            ListElement { col: 1; row: 0; terrainType: "rock" }
+            ListElement { col: 0; row: 1; terrainType: "grass" }
+            ListElement { col: 1; row: 1; terrainType: "grass" }
+        }
 
-            Rectangle {
-                width: 80
-                height: 80
-                color: "lightgreen"
-            }
+        delegate: Rectangle {
+            width: 80
+            height: 80
+            color: terrainType === "rock" ? "gray" : "lightgreen"
         }
     }
 }
