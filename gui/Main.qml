@@ -26,12 +26,7 @@ ApplicationWindow {
         cellHeight: 84
         interactive: false
 
-        model: ListModel {
-            ListElement { col: 0; row: 0; terrainType: "grass" }
-            ListElement { col: 1; row: 0; terrainType: "rock" }
-            ListElement { col: 0; row: 1; terrainType: "grass" }
-            ListElement { col: 1; row: 1; terrainType: "grass" }
-        }
+        model: mapModel
 
         delegate: Rectangle {
             width: 80

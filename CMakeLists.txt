@@ -13,6 +13,8 @@ target_compile_features(valka_mravenist PRIVATE cxx_std_20)
 
 add_executable(valka_mravenist_gui
     gui/main.cpp
+    gui/MapModel.h
+    gui/MapModel.cpp
 )
 
 qt_add_qml_module(valka_mravenist_gui
