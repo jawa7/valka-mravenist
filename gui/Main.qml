@@ -18,6 +18,7 @@ ApplicationWindow {
     }
 
     GridView {
+        id: grid
         anchors.centerIn: parent
         visible: window.inGame
         width: 2 * 84
@@ -28,10 +29,21 @@ ApplicationWindow {
 
         model: mapModel
 
+        highlight: Rectangle {
+            width: grid.cellWidth
+            height: grid.cellHeight
+            color: "yellow"
+        }
+
         delegate: Rectangle {
             width: 80
             height: 80
             color: terrainType === "rock" ? "gray" : "lightgreen"
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: grid.currentIndex = index
+            }
         }
     }
 }
