@@ -1,7 +1,15 @@
 #include "GameController.h"
 
-int GameController::selectTile(int index)
+int GameController::selectedIndex() const
 {
-    m_selectedIndex = index;
     return m_selectedIndex;
+}
+
+void GameController::selectTile(int index)
+{
+    if (m_selectedIndex == index) {
+        return;
+    }
+    m_selectedIndex = index;
+    emit selectedIndexChanged();
 }

@@ -26,6 +26,7 @@ ApplicationWindow {
         cellWidth: 84
         cellHeight: 84
         interactive: false
+        currentIndex: gameController.selectedIndex
 
         model: mapModel
 
@@ -42,7 +43,7 @@ ApplicationWindow {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: grid.currentIndex = gameController.selectTile(index)
+                onClicked: gameController.selectTile(index)
             }
         }
     }
