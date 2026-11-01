@@ -15,6 +15,8 @@ add_executable(valka_mravenist_gui
     gui/main.cpp
     gui/MapModel.h
     gui/MapModel.cpp
+    gui/GameController.h
+    gui/GameController.cpp
 )
 
 qt_add_qml_module(valka_mravenist_gui

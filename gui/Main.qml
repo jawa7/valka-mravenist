@@ -42,7 +42,7 @@ ApplicationWindow {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: grid.currentIndex = index
+                onClicked: grid.currentIndex = gameController.selectTile(index)
             }
         }
     }
