@@ -26,24 +26,19 @@ ApplicationWindow {
         cellWidth: 84
         cellHeight: 84
         interactive: false
-        currentIndex: gameController.selectedIndex
 
         model: mapModel
-
-        highlight: Rectangle {
-            width: grid.cellWidth
-            height: grid.cellHeight
-            color: "yellow"
-        }
 
         delegate: Rectangle {
             width: 80
             height: 80
-            color: terrainType === "rock" ? "gray" : "lightgreen"
+            readonly property bool selected: gameController.selectedX === index % 2
+                                             && gameController.selectedY === Math.floor(index / 2)
+            color: selected ? "yellow" : (terrainType === "rock" ? "gray" : "lightgreen")
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: gameController.selectTile(index)
+                onClicked: gameController.selectTile(index % 2, Math.floor(index / 2))
             }
         }
     }

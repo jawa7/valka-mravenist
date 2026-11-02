@@ -28,19 +28,22 @@ void testSelection()
 {
     GameController controller;
     int changes = 0;
-    QObject::connect(&controller, &GameController::selectedIndexChanged, [&changes] { ++changes; });
+    QObject::connect(&controller, &GameController::selectionChanged, [&changes] { ++changes; });
 
-    test_(controller.selectedIndex() == -1);
+    test_(controller.selectedX() == -1);
+    test_(controller.selectedY() == -1);
 
-    controller.selectTile(2);
-    test_(controller.selectedIndex() == 2);
+    controller.selectTile(1, 0);
+    test_(controller.selectedX() == 1);
+    test_(controller.selectedY() == 0);
     test_(changes == 1);
 
-    controller.selectTile(2);
+    controller.selectTile(1, 0);
     test_(changes == 1);
 
-    controller.selectTile(0);
-    test_(controller.selectedIndex() == 0);
+    controller.selectTile(0, 1);
+    test_(controller.selectedX() == 0);
+    test_(controller.selectedY() == 1);
     test_(changes == 2);
 }
 
