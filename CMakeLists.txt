@@ -5,6 +5,7 @@ project(valka_mravenist VERSION 0.1.0 LANGUAGES CXX)
 add_library(map STATIC
     src/map/GrassTerrain.cpp
     src/map/RockTerrain.cpp
+    src/map/Tile.cpp
 )
 target_include_directories(map PUBLIC src/map)
 target_compile_features(map PUBLIC cxx_std_20)
