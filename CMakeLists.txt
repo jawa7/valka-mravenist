@@ -7,6 +7,7 @@ add_library(map STATIC
     src/map/RockTerrain.cpp
     src/map/Tile.cpp
     src/map/GameBoard.cpp
+    src/map/TestMapFactory.cpp
 )
 target_include_directories(map PUBLIC src/map)
 target_compile_features(map PUBLIC cxx_std_20)
