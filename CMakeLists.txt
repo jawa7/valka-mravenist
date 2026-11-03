@@ -18,3 +18,6 @@ add_executable(valka_mravenist
 
 target_compile_features(valka_mravenist PRIVATE cxx_std_20)
 target_link_libraries(valka_mravenist PRIVATE map)
+
+add_executable(valka_mravenist_map_tests tests/map_tests.cpp)
+target_link_libraries(valka_mravenist_map_tests PRIVATE map)
