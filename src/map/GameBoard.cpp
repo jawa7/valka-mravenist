@@ -36,16 +36,22 @@ bool GameBoard::isValidPosition(int x, int y) const {
 }
 
 Tile* GameBoard::getTile(int x, int y) {
-    return isValidPosition(x, y) ? m_tiles[y][x].get() : nullptr;
+    if (!isValidPosition(x, y)) {
+        throw std::out_of_range("Position is outside the board");
+    }
+    return m_tiles[y][x].get();
 }
 
 const Tile* GameBoard::getTile(int x, int y) const {
-    return isValidPosition(x, y) ? m_tiles[y][x].get() : nullptr;
+    if (!isValidPosition(x, y)) {
+        throw std::out_of_range("Position is outside the board");
+    }
+    return m_tiles[y][x].get();
 }
 
 Tile* GameBoard::getTileAt(int index) {
     if (index < 0 || index >= getTileCount()) {
-        return nullptr;
+        throw std::out_of_range("Tile index is outside the board");
     }
     return getTile(index % m_width, index / m_width);
 }
@@ -55,19 +61,19 @@ std::vector<Tile*> GameBoard::getNeighbors(int x, int y) {
         {0, -1}, {1, 0}, {0, 1}, {-1, 0}
     }};
 
+    if (!isValidPosition(x, y)) {
+        throw std::out_of_range("Position is outside the board");
+    }
+
     std::vector<Tile*> neighbors;
     for (const auto& [dx, dy] : directions) {
-        if (Tile* tile = getTile(x + dx, y + dy)) {
-            neighbors.push_back(tile);
+        if (isValidPosition(x + dx, y + dy)) {
+            neighbors.push_back(getTile(x + dx, y + dy));
         }
     }
     return neighbors;
 }
 
 void GameBoard::setTerrain(int x, int y, std::unique_ptr<Terrain> terrain) {
-    Tile* tile = getTile(x, y);
-    if (tile == nullptr) {
-        throw std::out_of_range("Position is outside the board");
-    }
-    tile->setTerrain(std::move(terrain));
+    getTile(x, y)->setTerrain(std::move(terrain));
 }

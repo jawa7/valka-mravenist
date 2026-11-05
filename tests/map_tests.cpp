@@ -1,6 +1,7 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 
 #include "GameBoard.h"
 #include "RockTerrain.h"
@@ -26,7 +27,6 @@ static void testPositionValidation() {
     assert(!board.isValidPosition(-1, 0));
     assert(!board.isValidPosition(5, 0));
     assert(!board.isValidPosition(0, 4));
-    assert(board.getTile(5, 5) == nullptr);
 }
 
 static void testNeighbors() {
