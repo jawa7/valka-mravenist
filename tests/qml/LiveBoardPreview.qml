@@ -1,18 +1,33 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import "../../qml/presentation" as Presentation
 
 ApplicationWindow {
     visible: true
     width: 920
     height: 600
-    title: qsTr("Válka mravenišť – mapa z C++")
+    title: qsTr("Válka mravenišť – náhled")
 
-    Presentation.BoardPage {
+    StackLayout {
+        id: pages
         anchors.fill: parent
-        boardModel: gameMapModel
-        boardWidth: gameMapModel.boardWidth
-        boardHeight: gameMapModel.boardHeight
-        onBackRequested: Qt.quit()
+        currentIndex: 0
+
+        Presentation.PresentationMenu {
+            onNewGameRequested: {
+                sessionController.clearSelection()
+                pages.currentIndex = 1
+            }
+            onQuitRequested: Qt.quit()
+        }
+
+        Presentation.BoardPage {
+            boardModel: gameMapModel
+            boardWidth: gameMapModel.boardWidth
+            boardHeight: gameMapModel.boardHeight
+            controller: sessionController
+            onBackRequested: pages.currentIndex = 0
+        }
     }
 }

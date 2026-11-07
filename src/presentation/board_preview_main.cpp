@@ -3,17 +3,15 @@
 #include <QQmlContext>
 #include <QUrl>
 
-#include "GameBoardModel.h"
-#include "TestMapFactory.h"
+#include "GameSession.h"
 
 int main(int argc, char* argv[]) {
     QGuiApplication app(argc, argv);
-
-    auto board = TestMapFactory::create();
-    GameBoardModel model(*board);
+    GameSession session;
 
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("gameMapModel", &model);
+    engine.rootContext()->setContextProperty("gameMapModel", &session.mapModel());
+    engine.rootContext()->setContextProperty("sessionController", &session.controller());
     engine.load(QUrl::fromLocalFile(
         QStringLiteral(PRESENTATION_QML_DIR "/LiveBoardPreview.qml")));
 

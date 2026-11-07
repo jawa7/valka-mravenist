@@ -32,6 +32,10 @@ if(Qt6_FOUND)
     add_library(presentation_map STATIC
         src/presentation/GameBoardModel.cpp
         src/presentation/GameBoardModel.h
+        src/presentation/GameController.cpp
+        src/presentation/GameController.h
+        src/presentation/GameSession.cpp
+        src/presentation/GameSession.h
     )
     set_target_properties(presentation_map PROPERTIES AUTOMOC ON)
     target_include_directories(presentation_map PUBLIC src/presentation)
@@ -51,5 +55,11 @@ if(Qt6_FOUND)
         )
         target_link_libraries(valka_mravenist_presentation_model_tests PRIVATE presentation_map)
         add_test(NAME presentation_model_tests COMMAND valka_mravenist_presentation_model_tests)
+
+        add_executable(valka_mravenist_presentation_controller_tests
+            tests/presentation_controller_tests.cpp
+        )
+        target_link_libraries(valka_mravenist_presentation_controller_tests PRIVATE presentation_map)
+        add_test(NAME presentation_controller_tests COMMAND valka_mravenist_presentation_controller_tests)
     endif()
 endif()

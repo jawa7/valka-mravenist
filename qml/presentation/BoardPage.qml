@@ -8,11 +8,27 @@ Page {
     property var boardModel: null
     property int boardWidth: 0
     property int boardHeight: 0
-    property int selectedX: -1
-    property int selectedY: -1
+    property var controller: null
+    property int localSelectedX: -1
+    property int localSelectedY: -1
+    readonly property int selectedX: controller ? controller.selectedX : localSelectedX
+    readonly property int selectedY: controller ? controller.selectedY : localSelectedY
+    property string errorMessage: ""
 
     signal backRequested()
     signal tileClicked(int x, int y)
+
+    Connections {
+        target: root.controller
+
+        function onActionRejected(reason) {
+            root.errorMessage = reason
+        }
+
+        function onSelectionChanged() {
+            root.errorMessage = ""
+        }
+    }
 
     background: Rectangle {
         color: "#f1f4ed"
@@ -61,8 +77,12 @@ Page {
                     selectedY: root.selectedY
 
                     onTileClicked: function(x, y) {
-                        root.selectedX = x
-                        root.selectedY = y
+                        if (root.controller) {
+                            root.controller.handleTileClick(x, y)
+                        } else {
+                            root.localSelectedX = x
+                            root.localSelectedY = y
+                        }
                         root.tileClicked(x, y)
                     }
                 }
@@ -100,6 +120,14 @@ Page {
                               ? qsTr("Klikněte na políčko mapy.")
                               : qsTr("Souřadnice: %1, %2").arg(root.selectedX).arg(root.selectedY)
                         color: "#526658"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+
+                    Label {
+                        text: root.errorMessage
+                        visible: root.errorMessage.length > 0
+                        color: "#a23d30"
                         wrapMode: Text.WordWrap
                         Layout.fillWidth: true
                     }
