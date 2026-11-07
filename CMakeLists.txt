@@ -21,3 +21,35 @@ target_link_libraries(valka_mravenist PRIVATE map)
 
 add_executable(valka_mravenist_map_tests tests/map_tests.cpp)
 target_link_libraries(valka_mravenist_map_tests PRIVATE map)
+
+include(CTest)
+if(BUILD_TESTING)
+    add_test(NAME map_tests COMMAND valka_mravenist_map_tests)
+endif()
+
+find_package(Qt6 6.2 QUIET COMPONENTS Quick QuickControls2)
+if(Qt6_FOUND)
+    add_library(presentation_map STATIC
+        src/presentation/GameBoardModel.cpp
+        src/presentation/GameBoardModel.h
+    )
+    set_target_properties(presentation_map PROPERTIES AUTOMOC ON)
+    target_include_directories(presentation_map PUBLIC src/presentation)
+    target_link_libraries(presentation_map PUBLIC map Qt6::Core)
+
+    add_executable(valka_mravenist_presentation_preview
+        src/presentation/board_preview_main.cpp
+    )
+    target_link_libraries(valka_mravenist_presentation_preview PRIVATE
+        presentation_map Qt6::Quick Qt6::QuickControls2)
+    target_compile_definitions(valka_mravenist_presentation_preview PRIVATE
+        PRESENTATION_QML_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/tests/qml\")
+
+    if(BUILD_TESTING)
+        add_executable(valka_mravenist_presentation_model_tests
+            tests/presentation_model_tests.cpp
+        )
+        target_link_libraries(valka_mravenist_presentation_model_tests PRIVATE presentation_map)
+        add_test(NAME presentation_model_tests COMMAND valka_mravenist_presentation_model_tests)
+    endif()
+endif()
