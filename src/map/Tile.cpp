@@ -50,7 +50,7 @@ bool Tile::isOccupied() const {
 }
 
 bool Tile::placeUnit(Unit* unit) {
-    if (unit == nullptr || hasUnit()) {
+    if (unit == nullptr || isOccupied()) {
         return false;
     }
     m_unit = unit;

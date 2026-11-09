@@ -1,0 +1,15 @@
+digraph UML {
+    graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.6", ranksep="1.0", splines=polyline];
+    node [shape=record, style="rounded,filled", fillcolor="#f8fafc", color="#334155", fontname="DejaVu Sans", fontsize=10, margin="0.15,0.1"];
+    edge [color="#475569", arrowsize=0.7, fontname="DejaVu Sans", fontsize=9];
+    Unit [label="{«abstract» Unit|− id : int\l− ownerColonyId : int\l− currentHp, maxHp : int\l− baseAttack, baseDefense : int\l− movementRange : int\l− actionPoints, maxActionPoints : int\l− board : GameBoard*\l− x, y : int\l|+ getType() : UnitType (pure virtual)\l+ placeOnBoard(board, x, y) : bool\l+ removeFromBoard() : void\l+ canMoveTo(x, y) : bool\l+ moveTo(x, y) : bool\l+ takeDamage(damage) : void\l+ resetActionPoints() : void\l+ getEffectiveDefense() : int\l+ getX(), getY() : int\l+ isAlive(), isPlaced() : bool\l}", fillcolor="#e0f2fe"];
+    WorkerAnt [label="{WorkerAnt|+ DefaultMaxHp = 10\l+ DefaultAttack = 2\l+ DefaultDefense = 1\l+ DefaultMovementRange = 3\l+ DefaultActionPoints = 2\l|+ WorkerAnt(id, ownerColonyId)\l+ getType() : UnitType\l}", fillcolor="#dcfce7"];
+    GameBoard [label="{GameBoard|− tiles : Tile[][]\l|+ getTile(x, y) : Tile*\l+ getNeighbors(x, y) : vector of Tile*\l+ isValidPosition(x, y) : bool\l+ getLifetimeToken() : weak_ptr\l}"];
+    Tile [label="{Tile|− unit : Unit*\l− chamber : Chamber*\l− terrain : Terrain\l|+ placeUnit(Unit*) : bool\l+ removeUnit() : Unit*\l+ getTerrain() : const Terrain&\l+ isOccupied() : bool\l}"];
+    Terrain [label="{«abstract» Terrain|+ getMovementCost() : int\l+ getDefenseBonus() : int\l+ isPassableFor(UnitType) : bool\l}"];
+    WorkerAnt -> Unit [arrowhead=empty, label="inherits"];
+    Unit -> GameBoard [style=dashed, label="observes"];
+    GameBoard -> Tile [arrowhead=diamond, label="owns"];
+    Tile -> Terrain [arrowhead=diamond, label="owns"];
+    Tile -> Unit [style=dashed, label="non-owning pointer"];
+}

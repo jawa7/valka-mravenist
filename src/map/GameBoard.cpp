@@ -19,6 +19,10 @@ GameBoard::GameBoard(int width, int height)
     }
 }
 
+std::weak_ptr<void> GameBoard::getLifetimeToken() const noexcept {
+    return m_lifetimeToken;
+}
+
 int GameBoard::getWidth() const {
     return m_width;
 }
