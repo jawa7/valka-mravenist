@@ -1,5 +1,7 @@
 #include "GameController.h"
 #include "MapModel.h"
+#include "TestMapFactory.h"
+#include <QCoreApplication>
 #include <QObject>
 #include <QString>
 #include <iostream>
@@ -18,10 +20,55 @@ void check(bool ok, const char* text, const char* file, int line)
 
 void testMapModel()
 {
-    MapModel model;
-    test_(model.rowCount(QModelIndex()) == 4);
-    test_(model.data(model.index(0, 0), Qt::UserRole).toString() == QStringLiteral("grass"));
-    test_(model.data(model.index(1, 0), Qt::UserRole).toString() == QStringLiteral("rock"));
+    auto board = TestMapFactory::create();
+    MapModel model(*board);
+
+    test_(model.boardWidth() == 10);
+    test_(model.boardHeight() == 8);
+    test_(model.rowCount(QModelIndex()) == 80);
+    test_(model.rowCount(model.index(0, 0)) == 0);
+
+    const auto roles = model.roleNames();
+    test_(roles.value(MapModel::XRole) == "x");
+    test_(roles.value(MapModel::YRole) == "y");
+    test_(roles.value(MapModel::TerrainTypeRole) == "terrainType");
+    test_(roles.value(MapModel::UnitTypeRole) == "unitType");
+    test_(roles.value(MapModel::OwnerColonyIdRole) == "ownerColonyId");
+
+    // Grass at (0, 0)
+    QModelIndex origin = model.index(0, 0);
+    test_(model.data(origin, MapModel::XRole).toInt() == 0);
+    test_(model.data(origin, MapModel::YRole).toInt() == 0);
+    test_(model.data(origin, MapModel::TerrainTypeRole).toString() == QStringLiteral("Grass"));
+    test_(model.data(origin, MapModel::UnitTypeRole).toString().isEmpty());
+    test_(model.data(origin, MapModel::OwnerColonyIdRole).toInt() == -1);
+
+    // Rock placed by TestMapFactory at (3, 2): row = 2 * 10 + 3 = 23
+    QModelIndex rockIndex = model.index(23, 0);
+    test_(model.data(rockIndex, MapModel::XRole).toInt() == 3);
+    test_(model.data(rockIndex, MapModel::YRole).toInt() == 2);
+    test_(model.data(rockIndex, MapModel::TerrainTypeRole).toString() == QStringLiteral("Rock"));
+
+    // Boundary checks
+    test_(!model.data(QModelIndex(), MapModel::TerrainTypeRole).isValid());
+    test_(!model.data(model.index(-1, 0), MapModel::TerrainTypeRole).isValid());
+    test_(!model.data(model.index(80, 0), MapModel::TerrainTypeRole).isValid());
+
+    // Refresh signals
+    int changedCount = 0;
+    QObject::connect(&model, &QAbstractItemModel::dataChanged,
+                     [&changedCount](const QModelIndex&, const QModelIndex&, const QList<int>&) {
+                         ++changedCount;
+                     });
+
+    model.refreshTile(-1, 0);
+    test_(changedCount == 0);
+
+    model.refreshTile(0, 0);
+    test_(changedCount == 1);
+
+    model.refreshTiles(0, 0, 1, 0);
+    test_(changedCount == 3);
 }
 
 void testSelection()
@@ -47,8 +94,9 @@ void testSelection()
     test_(changes == 2);
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+    QCoreApplication app(argc, argv);
     testMapModel();
     testSelection();
     if (failures == 0) {

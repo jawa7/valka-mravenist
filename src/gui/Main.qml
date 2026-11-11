@@ -3,12 +3,14 @@ import QtQuick.Controls
 
 ApplicationWindow {
     id: window
-    width: 400
-    height: 300
+    width: 520
+    height: 440
     visible: true
     title: "Válka mravenišť"
 
     property bool inGame: false
+    readonly property int bWidth: mapModel ? mapModel.boardWidth : 10
+    readonly property int bHeight: mapModel ? mapModel.boardHeight : 8
 
     Button {
         anchors.centerIn: parent
@@ -21,25 +23,27 @@ ApplicationWindow {
         id: grid
         anchors.centerIn: parent
         visible: window.inGame
-        width: 2 * 84
-        height: 2 * 84
-        cellWidth: 84
-        cellHeight: 84
+        width: window.bWidth * 42
+        height: window.bHeight * 42
+        cellWidth: 42
+        cellHeight: 42
         interactive: false
 
         model: mapModel
 
         delegate: Rectangle {
-            width: 80
-            height: 80
-            readonly property bool selected: gameController.selectedX === index % 2
-                                             && gameController.selectedY === Math.floor(index / 2)
-            color: selected ? "yellow" : (terrainType === "rock" ? "gray" : "lightgreen")
+            width: 40
+            height: 40
+            radius: 3
+            readonly property bool selected: gameController.selectedX === model.x
+                                             && gameController.selectedY === model.y
+            color: selected ? "yellow" : (model.terrainType === "Rock" ? "#9e9e9e" : "#8fd18b")
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: gameController.selectTile(index % 2, Math.floor(index / 2))
+                onClicked: gameController.selectTile(model.x, model.y)
             }
         }
     }
 }
+
