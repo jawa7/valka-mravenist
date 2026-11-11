@@ -1,3 +1,6 @@
+#ifdef NDEBUG
+#undef NDEBUG // Keep existing assert-based map tests active in Release builds.
+#endif
 #include <cassert>
 #include <iostream>
 #include <memory>
@@ -6,8 +9,8 @@
 #include "GameBoard.h"
 #include "RockTerrain.h"
 #include "TestMapFactory.h"
+#include "WorkerAnt.h"
 
-class Unit {};
 class Chamber {};
 
 static void testBoardInitialization() {
@@ -50,8 +53,8 @@ static void testTerrainChange() {
 static void testOccupancy() {
     GameBoard board(3, 3);
     Tile* tile = board.getTile(1, 1);
-    Unit unit;
-    Unit otherUnit;
+    WorkerAnt unit(1, 0);
+    WorkerAnt otherUnit(2, 0);
     Chamber chamber;
 
     assert(!tile->isOccupied());
@@ -62,6 +65,7 @@ static void testOccupancy() {
     assert(!tile->isOccupied());
     assert(tile->placeChamber(&chamber));
     assert(tile->hasChamber());
+    assert(!tile->placeUnit(&unit)); // Chamber also blocks unit placement.
 }
 
 static void testFactoryMap() {

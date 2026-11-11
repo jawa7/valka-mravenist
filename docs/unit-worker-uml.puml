@@ -1,0 +1,66 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+
+abstract class Unit {
+  - id : int
+  - ownerColonyId : int
+  - currentHp : int
+  - maxHp : int
+  - baseAttack : int
+  - baseDefense : int
+  - movementRange : int
+  - actionPoints : int
+  - maxActionPoints : int
+  - board : GameBoard*
+  - boardLifetime : weak_ptr<void>
+  - x : int
+  - y : int
+  + getType() : UnitType {abstract}
+  + placeOnBoard(GameBoard&, int, int) : bool
+  + removeFromBoard() : void
+  + canMoveTo(int, int) : bool {virtual}
+  + moveTo(int, int) : bool {virtual}
+  + takeDamage(int) : void {virtual}
+  + resetActionPoints() : void {virtual}
+  + getEffectiveDefense() : int
+  + getX() : int
+  + getY() : int
+  + isAlive() : bool
+  + isPlaced() : bool
+}
+class WorkerAnt {
+  + WorkerAnt(id : int, ownerColonyId : int)
+  + getType() : UnitType
+  + DefaultMaxHp : int = 10
+  + DefaultAttack : int = 2
+  + DefaultDefense : int = 1
+  + DefaultMovementRange : int = 3
+  + DefaultActionPoints : int = 2
+}
+class GameBoard {
+  + getTile(x : int, y : int) : Tile*
+  + isValidPosition(x : int, y : int) : bool
+  + getNeighbors(x : int, y : int) : vector<Tile*>
+  + getLifetimeToken() : weak_ptr<void>
+}
+class Tile {
+  - unit : Unit*
+  - chamber : Chamber*
+  - terrain : unique_ptr<Terrain>
+  + placeUnit(Unit*) : bool
+  + removeUnit() : Unit*
+  + isOccupied() : bool
+  + getTerrain() : const Terrain&
+}
+abstract class Terrain {
+  + getDefenseBonus() : int
+  + getMovementCost() : int
+  + isPassableFor(UnitType) : bool
+}
+WorkerAnt --|> Unit
+Unit --> GameBoard : observes
+GameBoard *-- Tile : owns
+Tile --> Unit : non-owning
+Tile *-- Terrain : owns
+@enduml
