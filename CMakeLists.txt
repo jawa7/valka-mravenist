@@ -39,7 +39,13 @@ add_executable(valka_mravenist
 qt_add_qml_module(valka_mravenist
     URI AntWar
     VERSION 1.0
-    QML_FILES src/gui/Main.qml
+    QML_FILES
+        src/gui/Main.qml
+        src/gui/MenuHomePage.qml
+        src/gui/MenuRulesPage.qml
+        src/gui/BoardTile.qml
+        src/gui/BoardGrid.qml
+        src/gui/BoardPage.qml
 )
 
 target_compile_features(valka_mravenist PRIVATE cxx_std_20)

@@ -3,47 +3,54 @@ import QtQuick.Controls
 
 ApplicationWindow {
     id: window
-    width: 520
-    height: 440
+    width: 760
+    height: 540
+    minimumWidth: 620
+    minimumHeight: 460
     visible: true
     title: "Válka mravenišť"
+    color: "#f1f4ed"
 
-    property bool inGame: false
-    readonly property int bWidth: mapModel ? mapModel.boardWidth : 10
-    readonly property int bHeight: mapModel ? mapModel.boardHeight : 8
+    palette.window: "#f1f4ed"
+    palette.windowText: "#222222"
+    palette.base: "#ffffff"
+    palette.text: "#222222"
+    palette.button: "#ffffff"
+    palette.buttonText: "#29452d"
 
-    Button {
-        anchors.centerIn: parent
-        visible: !window.inGame
-        text: "Nová hra"
-        onClicked: window.inGame = true
+    StackView {
+        id: stack
+        anchors.fill: parent
+        initialItem: homePage
     }
 
-    GridView {
-        id: grid
-        anchors.centerIn: parent
-        visible: window.inGame
-        width: window.bWidth * 42
-        height: window.bHeight * 42
-        cellWidth: 42
-        cellHeight: 42
-        interactive: false
+    Component {
+        id: homePage
 
-        model: mapModel
+        MenuHomePage {
+            onNewGameRequested: stack.push(boardPage)
+            onRulesRequested: stack.push(rulesPage)
+            onQuitRequested: Qt.quit()
+        }
+    }
 
-        delegate: Rectangle {
-            width: 40
-            height: 40
-            radius: 3
-            readonly property bool selected: gameController.selectedX === model.x
-                                             && gameController.selectedY === model.y
-            color: selected ? "yellow" : (model.terrainType === "Rock" ? "#9e9e9e" : "#8fd18b")
+    Component {
+        id: rulesPage
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: gameController.selectTile(model.x, model.y)
-            }
+        MenuRulesPage {
+            onBackRequested: stack.pop()
+        }
+    }
+
+    Component {
+        id: boardPage
+
+        BoardPage {
+            boardModel: mapModel
+            controller: gameController
+            onBackRequested: stack.pop()
         }
     }
 }
+
 
