@@ -1,4 +1,5 @@
 #include "GameController.h"
+#include "GameSession.h"
 #include "MapModel.h"
 #include "TestMapFactory.h"
 #include <QCoreApplication>
@@ -35,7 +36,6 @@ void testMapModel()
     test_(roles.value(MapModel::UnitTypeRole) == "unitType");
     test_(roles.value(MapModel::OwnerColonyIdRole) == "ownerColonyId");
 
-    // Grass at (0, 0)
     QModelIndex origin = model.index(0, 0);
     test_(model.data(origin, MapModel::XRole).toInt() == 0);
     test_(model.data(origin, MapModel::YRole).toInt() == 0);
@@ -43,18 +43,15 @@ void testMapModel()
     test_(model.data(origin, MapModel::UnitTypeRole).toString().isEmpty());
     test_(model.data(origin, MapModel::OwnerColonyIdRole).toInt() == -1);
 
-    // Rock placed by TestMapFactory at (3, 2): row = 2 * 10 + 3 = 23
     QModelIndex rockIndex = model.index(23, 0);
     test_(model.data(rockIndex, MapModel::XRole).toInt() == 3);
     test_(model.data(rockIndex, MapModel::YRole).toInt() == 2);
     test_(model.data(rockIndex, MapModel::TerrainTypeRole).toString() == QStringLiteral("Rock"));
 
-    // Boundary checks
     test_(!model.data(QModelIndex(), MapModel::TerrainTypeRole).isValid());
     test_(!model.data(model.index(-1, 0), MapModel::TerrainTypeRole).isValid());
     test_(!model.data(model.index(80, 0), MapModel::TerrainTypeRole).isValid());
 
-    // Refresh signals
     int changedCount = 0;
     QObject::connect(&model, &QAbstractItemModel::dataChanged,
                      [&changedCount](const QModelIndex&, const QModelIndex&, const QList<int>&) {
@@ -71,34 +68,70 @@ void testMapModel()
     test_(changedCount == 3);
 }
 
-void testSelection()
+void testGameSessionAndController()
 {
-    GameController controller;
-    int changes = 0;
-    QObject::connect(&controller, &GameController::selectionChanged, [&changes] { ++changes; });
+    GameSession session;
+    test_(session.mapModel().rowCount() == 80);
+    test_(session.mapModel().boardWidth() == 10);
+    test_(session.mapModel().boardHeight() == 8);
 
+    GameController& controller = session.controller();
+    test_(!controller.hasSelection());
     test_(controller.selectedX() == -1);
     test_(controller.selectedY() == -1);
 
-    controller.selectTile(1, 0);
-    test_(controller.selectedX() == 1);
-    test_(controller.selectedY() == 0);
-    test_(changes == 1);
+    int selectionSignals = 0;
+    int rejectionSignals = 0;
+    QString lastRejection;
 
-    controller.selectTile(1, 0);
-    test_(changes == 1);
+    QObject::connect(&controller, &GameController::selectionChanged,
+                     [&selectionSignals]() { ++selectionSignals; });
+    QObject::connect(&controller, &GameController::actionRejected,
+                     [&rejectionSignals, &lastRejection](const QString& reason) {
+                         ++rejectionSignals;
+                         lastRejection = reason;
+                     });
 
-    controller.selectTile(0, 1);
+    controller.handleTileClick(3, 2);
+    test_(controller.hasSelection());
+    test_(controller.selectedX() == 3);
+    test_(controller.selectedY() == 2);
+    test_(selectionSignals == 1);
+
+    controller.handleTileClick(3, 2);
+    test_(selectionSignals == 1);
+
+    controller.handleTileClick(-1, 2);
+    controller.handleTileClick(10, 0);
+    controller.handleTileClick(0, 8);
+    test_(rejectionSignals == 3);
+    test_(lastRejection == QStringLiteral("Políčko je mimo mapu."));
+
+    test_(controller.hasSelection());
+    test_(controller.selectedX() == 3);
+    test_(controller.selectedY() == 2);
+    test_(selectionSignals == 1);
+
+    controller.handleTileClick(0, 0);
     test_(controller.selectedX() == 0);
-    test_(controller.selectedY() == 1);
-    test_(changes == 2);
+    test_(controller.selectedY() == 0);
+    test_(selectionSignals == 2);
+
+    controller.clearSelection();
+    test_(!controller.hasSelection());
+    test_(controller.selectedX() == -1);
+    test_(controller.selectedY() == -1);
+    test_(selectionSignals == 3);
+
+    controller.clearSelection();
+    test_(selectionSignals == 3);
 }
 
 int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
     testMapModel();
-    testSelection();
+    testGameSessionAndController();
     if (failures == 0) {
         std::cout << "all checks passed\n";
         return 0;

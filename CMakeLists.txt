@@ -10,7 +10,6 @@ include(CTest)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Quick)
 
-# --- Backend: Map environment ---
 add_library(map STATIC
     src/map/GrassTerrain.cpp
     src/map/RockTerrain.cpp
@@ -21,18 +20,18 @@ add_library(map STATIC
 target_include_directories(map PUBLIC src/map)
 target_compile_features(map PUBLIC cxx_std_20)
 
-# --- Presentation / GUI library ---
 add_library(gui STATIC
     src/gui/MapModel.h
     src/gui/MapModel.cpp
     src/gui/GameController.h
     src/gui/GameController.cpp
+    src/gui/GameSession.h
+    src/gui/GameSession.cpp
 )
 target_include_directories(gui PUBLIC src/gui)
 target_compile_features(gui PUBLIC cxx_std_20)
 target_link_libraries(gui PUBLIC map Qt6::Quick)
 
-# --- Main application ---
 add_executable(valka_mravenist
     src/main.cpp
 )
@@ -46,7 +45,6 @@ qt_add_qml_module(valka_mravenist
 target_compile_features(valka_mravenist PRIVATE cxx_std_20)
 target_link_libraries(valka_mravenist PRIVATE gui)
 
-# --- Tests ---
 if(BUILD_TESTING)
     add_executable(valka_mravenist_map_tests tests/map_tests.cpp)
     target_link_libraries(valka_mravenist_map_tests PRIVATE map)

@@ -1,6 +1,4 @@
-#include "GameController.h"
-#include "MapModel.h"
-#include "TestMapFactory.h"
+#include "GameSession.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -8,12 +6,10 @@
 int main(int argc, char* argv[])
 {
     QGuiApplication app(argc, argv);
-    auto board = TestMapFactory::create();
-    MapModel mapModel(*board);
-    GameController gameController;
+    GameSession session;
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("mapModel", &mapModel);
-    engine.rootContext()->setContextProperty("gameController", &gameController);
+    engine.rootContext()->setContextProperty("mapModel", &session.mapModel());
+    engine.rootContext()->setContextProperty("gameController", &session.controller());
     engine.loadFromModule("AntWar", "Main");
     return app.exec();
 }
