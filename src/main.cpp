@@ -1,6 +1,16 @@
-#include <iostream>
+#include "GameSession.h"
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
 
-int main() {
-    std::cout << "Hello World.\n";
-    return 0;
+int main(int argc, char* argv[])
+{
+    qputenv("QT_QUICK_CONTROLS_STYLE", "Basic");
+    QGuiApplication app(argc, argv);
+    GameSession session;
+    QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("mapModel", &session.mapModel());
+    engine.rootContext()->setContextProperty("gameController", &session.controller());
+    engine.loadFromModule("AntWar", "Main");
+    return app.exec();
 }
